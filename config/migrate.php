@@ -8,4 +8,4 @@ $config['path'] = APPPATH."db";
 
 $config['help'] = MIGRATE_MODULE_PATH.'USAGE.md';
 
-$config['template'] = MIGRATE_MODULE_PATH.'_template.php';
+$config['template'] = MIGRATE_MODULE_PATH.'bin/_template.php';

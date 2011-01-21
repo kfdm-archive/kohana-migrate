@@ -26,16 +26,35 @@ class Console_Migrator {
 	}
 	/**
 	 * Create a new migration script
-	 * @param unknown_type $args
+	 * @param array $args Program arguments
 	 */
 	protected function cmd_create($args) {
-		var_dump($args);
+		$template = Config::item('migrate.template');
+		
+		if(!isset($args[2]))
+			throw new Console_Error('Missing tag name');
+		
+		$tag = implode(' ',array_slice($args,2));
+		$date = Migrate::date();
+		$class = Migrate::classname($date,$tag);
+		$file = Migrate::filename($date,$tag);
+		
+		$body = file_get_contents($template);
+		if($body===FALSE)
+			throw new Console_Error('Error reading template');
+		
+		$body = str_replace('Template_Migration',$class,$body);
+			
+		if(file_put_contents($file, $body)===FALSE)
+			throw new Console_Error('Error writing template');
+		
+		echo "Created migration [{$class}] in {$file}\n";
 	}
 	/**
 	 * Print out help
 	 * @param mixed $args Program Arguments
 	 */
-	protected function cmd_help($args) {
+	public function cmd_help($args) {
 		echo str_replace('%prog%',$args[0],file_get_contents(Config::item('migrate.help')));
 	}
 }
@@ -44,5 +63,7 @@ try {
 	$app = new Console_Migrator();
 	$app->run($argv);
 } catch(Console_Error $e) {
-	die($e);
+	echo $e;
+	$app->cmd_help($argv);
+	die();
 }
