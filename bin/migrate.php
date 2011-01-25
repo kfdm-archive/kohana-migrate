@@ -1,6 +1,14 @@
 <?php
 require(realpath(dirname(__FILE__)).'/_console.php');
 
+function println($string) {
+	fwrite(STDOUT, "{$string}\n");
+}
+
+function errorln($string) {
+	fwrite(STDERR, "{$string}\n");
+}
+
 class Console_Migrator {
 	public function __construct() {
 		$path = Config::item('migrate.path');
@@ -9,6 +17,14 @@ class Console_Migrator {
 			echo "Please check your configuration and try again\n";
 			die();
 		}
+		$this->db = Database::instance();
+	}
+	/**
+	 * Print out the list of Database queries
+	 */
+	public static function query_log() {
+		foreach(Database::$benchmarks as $b)
+			errorln(str_replace(array("\n","\t"),' ',$b['query']));
 	}
 	/**
 	 * Main starting point
@@ -23,6 +39,23 @@ class Console_Migrator {
 			throw new Console_Error("Could not find method {$method}");
 		
 		$this->$method($argv);
+	}
+	/**
+	 * Install Migration System
+	 * @param array $args Program arguments
+	 */
+	protected function cmd_install($args) {
+		$db = Database::instance();
+		$table = Config::item('migrate.table');
+		if($db->table_exists($table))
+			throw new Console_Error("Migration table '{$table}' already exists");
+		$migration = Config::item('migrate.setup');
+		
+		$sql = file_get_contents($migration);
+		$sql = str_replace('`migration_table`',"`{$table}`",$sql);
+		
+		println("Creating table {$table}");
+		$db->query($sql);
 	}
 	/**
 	 * Create a new migration script
@@ -65,5 +98,6 @@ try {
 } catch(Console_Error $e) {
 	echo $e;
 	$app->cmd_help($argv);
-	die();
 }
+
+Console_Migrator::query_log();
