@@ -7,8 +7,13 @@
  */
 abstract class Migration_Core {
 	protected $db = NULL;
-	public function __construct() {
+	protected $time = NULL;
+	/**
+	 * @param integer $time Unix timestamp
+	 */
+	public function __construct($time) {
 		$this->db = Database::instance();
+		$this->time = $time;
 	}
 	public function up() {
 		throw new Exception('NOT IMPLEMENTED');

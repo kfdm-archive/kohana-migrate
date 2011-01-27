@@ -49,13 +49,11 @@ class Migrate_Core {
 	}
 	
 	public static function load($file) {
-		list($date,$class) = self::decode($file);
-		
-		println($class);
+		list($time,$class) = self::decode($file);
 		
 		require_once($file);
 		
-		$migration = new $class();
-		return array($date,$migration);
+		$migration = new $class($time);
+		return array($time,$migration);
 	}
 }

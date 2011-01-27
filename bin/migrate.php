@@ -82,6 +82,12 @@ class Console_Migrator {
 		echo "Created migration [{$class}] in {$file}\n";
 	}
 	protected function cmd_up($args) {
+		return $this->_cmd_go($args,'up');
+	}
+	protected function cmd_down($args) {
+		return $this->_cmd_go($args,'down');
+	}
+	protected function _cmd_go($args,$method) {
 		println('Running migrations...');
 		$list = array();
 		foreach(Kohana::list_files('db') as $file) {
@@ -89,8 +95,10 @@ class Console_Migrator {
 			$list[$date] = $migration;
 		}
 		
+		if($method==='down') $list = array_reverse($list,TRUE);
+		
 		foreach($list as $m)
-			$m->up();
+			$m->$method();
 	}
 	/**
 	 * Print out help
