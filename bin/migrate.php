@@ -68,9 +68,7 @@ class Console_Migrator {
 			throw new Console_Error('Missing tag name');
 		
 		$tag = implode(' ',array_slice($args,2));
-		$date = Migrate::date();
-		$class = Migrate::classname($date,$tag);
-		$file = Migrate::filename($date,$tag);
+		list($class, $file) = Migrate::encode(time(), $tag);
 		
 		$body = file_get_contents($template);
 		if($body===FALSE)
@@ -82,6 +80,17 @@ class Console_Migrator {
 			throw new Console_Error('Error writing template');
 		
 		echo "Created migration [{$class}] in {$file}\n";
+	}
+	protected function cmd_up($args) {
+		println('Running migrations...');
+		$list = array();
+		foreach(Kohana::list_files('db') as $file) {
+			list($date,$migration) = Migrate::load($file);
+			$list[$date] = $migration;
+		}
+		
+		foreach($list as $m)
+			$m->up();
 	}
 	/**
 	 * Print out help

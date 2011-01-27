@@ -10,6 +10,13 @@ abstract class Migration_Core {
 	public function __construct() {
 		$this->db = Database::instance();
 	}
-	public abstract function up() ;
-	public abstract function down();
+	public function up() {
+		throw new Exception('NOT IMPLEMENTED');
+	}
+	public function down() {
+		throw new Exception('NOT IMPLEMENTED');
+	}
+	public function __toString() {
+		return getclass($this);
+	}
 }

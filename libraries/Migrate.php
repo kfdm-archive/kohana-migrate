@@ -7,39 +7,55 @@
  * calling individual (or groups) of migrations
  */
 class Migrate_Core {
-	public static function date() {
-		return strftime('%Y%m%d.%H%M%S');
-	}
-	/**
-	 * Hash our date string to use in the class name
-	 * @param string $date
-	 * @see self::date()
-	 */
-	public static function hash($date) {
-		return strtoupper(substr(md5($date),0,5));
-	}
 	/**
 	 * Generate migration classname
-	 * @param string $date Date in the format from self::date()
+	 * @param integer $time Unix timestamp
 	 * @param string $tag Tags with whitespace in the form "word word word"
-	 * @see self::date()
 	 * @return string Classname
 	 */
-	public static function classname($date,$tag) {
-		$hash = self::hash($date);
+	public static function classname($time,$tag) {
+		$hash = strtoupper(dechex($time));
 		$class = str_replace(' ','_',ucwords($tag));
 		return "{$class}_{$hash}_Migration";
 	}
 	/**
-	 * Generate migration filename
-	 * @param string $date Date in the format from self::date()
-	 * @param string $tag Tags with whitespace in the form "word word word"
-	 * @see self::date()
-	 * @return string Filename
+	 * Encode a filename and class
+	 * @param integer $time Unix timestamp
+	 * @param string $tag Tag string
+	 * @return array array($class, $file)
 	 */
-	public static function filename($date,$tag) {
+	public static function encode($time,$tag) {
 		$path = Config::item('migrate.path');
-		$tag = url::title($tag,'_');
-		return  "{$path}/{$date}-{$tag}.php";
+		
+		$date = strftime('%F', $time);
+		$hash = strtoupper(dechex($time));
+		$class = self::classname($time,$tag);
+		$tag = url::title($tag,'-');
+		
+		$file = "{$path}/{$date}.{$tag}.{$hash}.php";
+		
+		return array($class, $file);
+	}
+	/**
+	 * Decode a file name into the parts we need
+	 * @param string $file
+	 * @return array array($date, $class)
+	 */
+	public static function decode($file) {
+		list($date,$tag,$hash,$ext) = explode('.',basename($file));
+		$time = hexdec($hash); // Extract Unix timestamp
+		$class = self::classname($time,str_replace('-',' ',$tag));
+		return array($time,$class);
+	}
+	
+	public static function load($file) {
+		list($date,$class) = self::decode($file);
+		
+		println($class);
+		
+		require_once($file);
+		
+		$migration = new $class();
+		return array($date,$migration);
 	}
 }
