@@ -96,8 +96,7 @@ try {
 	$app = new Console_Migrator();
 	$app->run($argv);
 } catch(Console_Error $e) {
-	echo $e;
-	$app->cmd_help($argv);
+	errorln($e);
 }
 
 Console_Migrator::query_log();
