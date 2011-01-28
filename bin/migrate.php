@@ -21,10 +21,17 @@ class Console_Migrator {
 	}
 	/**
 	 * Print out the list of Database queries
+	 * 
+	 * Queries that contain the IGNORE comment will not
+	 * be printed so that we have an easy way to ignore 
+	 * 'housekeeping' queries from the output
 	 */
 	public static function query_log() {
-		foreach(Database::$benchmarks as $b)
-			errorln(str_replace(array("\n","\t"),' ',$b['query']));
+		foreach(Database::$benchmarks as $b) {
+			if(strrpos($b['query'],'/* IGNORE */')!==FALSE) continue;
+			$sql = str_replace(array("\n","\t"),' ',$b['query']);
+			errorln("{$sql}\n\t#Time: {$b['time']}  Rows: {$b['rows']}");
+		}
 	}
 	/**
 	 * Main starting point
@@ -89,16 +96,13 @@ class Console_Migrator {
 	}
 	protected function _cmd_go($args,$method) {
 		println('Running migrations...');
-		$list = array();
-		foreach(Kohana::list_files('db') as $file) {
-			list($date,$migration) = Migrate::load($file);
-			$list[$date] = $migration;
-		}
 		
-		if($method==='down') $list = array_reverse($list,TRUE);
+		$files = Kohana::list_files('db');
 		
-		foreach($list as $m)
-			$m->$method();
+		if($method==='down') $files = array_reverse($files);
+		
+		foreach($files as $file)
+			Migrate::run($file, $method);
 	}
 	/**
 	 * Print out help
