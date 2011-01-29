@@ -16,10 +16,10 @@ abstract class Migration_Core {
 		$this->time = $time;
 	}
 	public function up() {
-		throw new Exception('NOT IMPLEMENTED');
+		throw new Migrate_Error('migrate.not_implemented');
 	}
 	public function down() {
-		throw new Exception('NOT IMPLEMENTED');
+		throw new Migrate_Error('migrate.not_implemented');
 	}
 	public function __toString() {
 		return getclass($this);

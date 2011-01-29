@@ -12,11 +12,8 @@ function errorln($string) {
 class Console_Migrator {
 	public function __construct() {
 		$path = Config::item('migrate.path');
-		if(!file_exists($path)) {
-			echo "There was a problem finding the migration directory {$path}\n";
-			echo "Please check your configuration and try again\n";
-			die();
-		}
+		if(!file_exists($path))
+			throw new Migrate_Error('migrate.config_directory',$path);
 		$this->db = Database::instance();
 	}
 	/**
@@ -43,7 +40,7 @@ class Console_Migrator {
 		
 		$method = "cmd_{$argv[1]}";
 		if(!method_exists($this,$method))
-			throw new Console_Error("Could not find method {$method}");
+			throw new Migrate_Error('migrate.invalid_command',$argv[1]);
 		
 		$this->$method($argv);
 	}
@@ -55,7 +52,7 @@ class Console_Migrator {
 		$db = Database::instance();
 		$table = Config::item('migrate.table');
 		if($db->table_exists($table))
-			throw new Console_Error("Migration table '{$table}' already exists");
+			throw new Migrate_Error('migrate.config_table_exists',$table);
 		$migration = Config::item('migrate.setup');
 		
 		$sql = file_get_contents($migration);
@@ -72,19 +69,19 @@ class Console_Migrator {
 		$template = Config::item('migrate.template');
 		
 		if(!isset($args[2]))
-			throw new Console_Error('Missing tag name');
+			throw new Migrate_Error('migrate.args_tag');
 		
 		$tag = implode(' ',array_slice($args,2));
 		list($class, $file) = Migrate::encode(time(), $tag);
 		
 		$body = file_get_contents($template);
 		if($body===FALSE)
-			throw new Console_Error('Error reading template');
+			throw new Migrate_Error('migrate.config_template',$template);
 		
 		$body = str_replace('Template_Migration',$class,$body);
 			
 		if(file_put_contents($file, $body)===FALSE)
-			throw new Console_Error('Error writing template');
+			throw new Migrate_Error('migrate.write_migration',$file);
 		
 		echo "Created migration [{$class}] in {$file}\n";
 	}
@@ -116,7 +113,7 @@ class Console_Migrator {
 try {
 	$app = new Console_Migrator();
 	$app->run($argv);
-} catch(Console_Error $e) {
+} catch(Migrate_Error $e) {
 	errorln($e);
 }
 
