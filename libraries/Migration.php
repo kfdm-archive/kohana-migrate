@@ -6,14 +6,33 @@
  * single migration
  */
 abstract class Migration_Core {
-	protected $db = NULL;
-	protected $time = NULL;
+	protected $driver;
+	protected $time;
 	/**
 	 * @param integer $time Unix timestamp
 	 */
 	public function __construct($time) {
-		$this->db = Database::instance();
+		$this->driver = self::driver();
 		$this->time = $time;
+	}
+	/**
+	 * Load Migration Driver
+	 */
+	protected static function driver() {
+		$driver = Config::item('migrate.driver');
+		$driver = "Migrate_{$driver}_Driver";
+		return new $driver(Database::instance());
+	}
+	/**
+	 * Catch 'other' method calls
+	 * Any additional method calls that we get, we attempt to send to the 
+	 * migration driver to deal with.  This should handle the various helper
+	 * method calls that we might end up using.
+	 * @param string $method
+	 * @param array $args
+	 */
+	public function __call($method,$args) {
+		return call_user_func_array(array($this->driver,$method),$args);
 	}
 	public function up() {
 		throw new Migrate_Error('migrate.not_implemented');
@@ -23,5 +42,11 @@ abstract class Migration_Core {
 	}
 	public function __toString() {
 		return getclass($this);
+	}
+}
+
+class Irreversible_Error extends Migrate_Error {
+	public function __construct() {
+		parent::__construct('migrate.irreversible');
 	}
 }

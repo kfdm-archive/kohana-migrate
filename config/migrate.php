@@ -13,3 +13,5 @@ $config['template'] = MIGRATE_MODULE_PATH.'bin/_template.php';
 $config['table'] = 'migrations';
 
 $config['setup'] = MIGRATE_MODULE_PATH.'bin/_migration.sql';
+
+$config['driver'] = 'mysql';
