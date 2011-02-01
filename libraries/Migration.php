@@ -19,7 +19,7 @@ abstract class Migration_Core {
 	 * Load Migration Driver
 	 */
 	protected static function driver() {
-		$driver = Config::item('migrate.driver');
+		$driver = ucfirst(Config::item('migrate.driver'));
 		$driver = "Migrate_{$driver}_Driver";
 		return new $driver(Database::instance());
 	}
