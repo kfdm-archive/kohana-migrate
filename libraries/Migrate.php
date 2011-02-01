@@ -74,9 +74,15 @@ class Migrate_Core {
 		list($time,$migration) = self::load($file);
 		$class = get_class($migration);
 		
+		// Check to see if this migration has already been run
 		$r = $db->query('SELECT * FROM `migrations` WHERE `created_on` = FROM_UNIXTIME(?) /* IGNORE */',array($time));
 		if(count($r)>0 && $r->current()->status==$method)
-			return; // Already Run 
+			return;
+			
+		// If we are attempting to run the 'down' migration but the corrisponding
+		// 'up' migration has never been run, then skip
+		if(count($r)==0 && $method=='down')
+			return;
 		
 		// Start Marker
 		Database::$benchmarks[] = array(
