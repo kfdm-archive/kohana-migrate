@@ -94,12 +94,16 @@ class Console_Migrator {
 	protected function _cmd_go($args,$method) {
 		println('Running migrations...');
 		
-		$files = Kohana::list_files('db');
+		$files = Migrate::migrations();
 		
 		if($method==='down') $files = array_reverse($files);
 		
 		foreach($files as $file)
 			Migrate::run($file, $method);
+	}
+	protected function cmd_list($args) {
+	    foreach(Migrate::migrations() as $file)
+	        println(basename($file));
 	}
 	/**
 	 * Print out help

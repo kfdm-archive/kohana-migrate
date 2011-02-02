@@ -57,6 +57,19 @@ class Migrate_Core {
 		return array($time,$migration);
 	}
 	/**
+	 * Get a list of migration files
+	 * Uses the Kohana::list_files() function but skips
+	 * files that don't end in .php
+	 * @return array List of migration folders
+	 */
+	public static function migrations() {
+		$files = array();
+		foreach(Kohana::list_files('db') as $file)
+			if(substr_compare($file, '.php', -4, 4) === 0)
+				$files[] = $file;
+		return $files;
+	}
+	/**
 	 * Run a migration
 	 * This function is responsible for running a migration and
 	 * keeping track of migrations to prevent them running again
