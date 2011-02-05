@@ -63,6 +63,11 @@ class Console_Migrator {
 	}
 	/**
 	 * Create a new migration script
+	 * 
+	 * <code>
+	 * %prog% create <tag name>
+	 * </code>
+	 * 
 	 * @param array $args Program arguments
 	 */
 	protected function cmd_create($args) {
@@ -85,16 +90,45 @@ class Console_Migrator {
 		
 		echo "Created migration [{$class}] in {$file}\n";
 	}
+	/**
+	 * Apply a migration
+	 * 
+	 * <code>
+	 * # Run all migrations
+	 * %prog% up
+	 * # Run single migration with [name]
+	 * %prog% up [name]
+	 * </code>
+	 * 
+	 * @param mixed $args
+	 */
 	protected function cmd_up($args) {
 		return isset($args[2])?
 			$this->_cmd_run_one($args,'up'):
 			$this->_cmd_go($args,'up');
 	}
+	/**
+	 * Revert a migration
+	 * 
+	 * <code>
+	 * # Revert all migrations
+	 * %prog% down
+	 * # Revert single migration with [name]
+	 * %prog% down [name]
+	 * </code>
+	 * 
+	 * @param mixed $args
+	 */
 	protected function cmd_down($args) {
 		return isset($args[2])?
 			$this->_cmd_run_one($args,'down'):
 			$this->_cmd_go($args,'down');
 	}
+	/**
+	 * Helper function to run all migrations
+	 * @param mixed $args
+	 * @param string $method up|down
+	 */
 	protected function _cmd_go($args,$method) {
 		println('Running migrations...');
 		
@@ -105,6 +139,12 @@ class Console_Migrator {
 		foreach($files as $file)
 			Migrate::run($file, $method);
 	}
+	/**
+	 * Helper function to run single migration
+	 * @param mixed $args
+	 * @param string $method up|down
+	 * @throws Migrate_Error
+	 */
 	protected function _cmd_run_one($args,$method) {
 		foreach(Migrate::migrations() as $file)
 			if(basename($file,'.php')==$args[2])
@@ -115,12 +155,26 @@ class Console_Migrator {
 		println('Running migration '.$args[2]);
 		Migrate::run($run, $method);
 	}
+	/**
+	 * List available migrations
+	 * 
+	 * <code>
+	 * %prog% list
+	 * </code>
+	 * 
+	 * @param unknown_type $args
+	 */
 	protected function cmd_list($args) {
 	    foreach(Migrate::migrations() as $file)
 	        println(basename($file,'.php'));
 	}
 	/**
 	 * Print out help
+	 * 
+	 * <code>
+	 * %prog% help
+	 * </code>
+	 * 
 	 * @param mixed $args Program Arguments
 	 */
 	public function cmd_help($args) {
