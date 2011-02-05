@@ -14,4 +14,5 @@ $lang = array(
 
 	// Various Argument Errors
 	'args_tag'				=> 'Missing tag name',
+	'missing'				=> 'Could not find migration %s',
 );

@@ -86,10 +86,14 @@ class Console_Migrator {
 		echo "Created migration [{$class}] in {$file}\n";
 	}
 	protected function cmd_up($args) {
-		return $this->_cmd_go($args,'up');
+		return isset($args[2])?
+			$this->_cmd_run_one($args,'up'):
+			$this->_cmd_go($args,'up');
 	}
 	protected function cmd_down($args) {
-		return $this->_cmd_go($args,'down');
+		return isset($args[2])?
+			$this->_cmd_run_one($args,'down'):
+			$this->_cmd_go($args,'down');
 	}
 	protected function _cmd_go($args,$method) {
 		println('Running migrations...');
@@ -101,9 +105,19 @@ class Console_Migrator {
 		foreach($files as $file)
 			Migrate::run($file, $method);
 	}
+	protected function _cmd_run_one($args,$method) {
+		foreach(Migrate::migrations() as $file)
+			if(basename($file,'.php')==$args[2])
+				$run = $file;
+		if(!isset($run))
+			throw new Migrate_Error('migrate.missing',$args[2]);
+		
+		println('Running migration '.$args[2]);
+		Migrate::run($run, $method);
+	}
 	protected function cmd_list($args) {
 	    foreach(Migrate::migrations() as $file)
-	        println(basename($file));
+	        println(basename($file,'.php'));
 	}
 	/**
 	 * Print out help
