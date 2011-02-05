@@ -46,6 +46,9 @@ class Console_Migrator {
 	}
 	/**
 	 * Install Migration System
+	 * 
+	 * %prog% install
+	 * 
 	 * @param array $args Program arguments
 	 */
 	protected function cmd_install($args) {
@@ -64,9 +67,7 @@ class Console_Migrator {
 	/**
 	 * Create a new migration script
 	 * 
-	 * <code>
-	 * %prog% create <tag name>
-	 * </code>
+	 * %prog% create <tag name> - Create a new migration
 	 * 
 	 * @param array $args Program arguments
 	 */
@@ -93,12 +94,8 @@ class Console_Migrator {
 	/**
 	 * Apply a migration
 	 * 
-	 * <code>
-	 * # Run all migrations
-	 * %prog% up
-	 * # Run single migration with [name]
-	 * %prog% up [name]
-	 * </code>
+	 * %prog% up - Run all migrations
+	 * %prog% up [name] - Revert single migration
 	 * 
 	 * @param mixed $args
 	 */
@@ -110,12 +107,8 @@ class Console_Migrator {
 	/**
 	 * Revert a migration
 	 * 
-	 * <code>
-	 * # Revert all migrations
-	 * %prog% down
-	 * # Revert single migration with [name]
-	 * %prog% down [name]
-	 * </code>
+	 * %prog% down - Revert all migrations
+	 * %prog% down [name] - Revert single migration
 	 * 
 	 * @param mixed $args
 	 */
@@ -158,9 +151,7 @@ class Console_Migrator {
 	/**
 	 * List available migrations
 	 * 
-	 * <code>
-	 * %prog% list
-	 * </code>
+	 * %prog% list - List all migrations
 	 * 
 	 * @param unknown_type $args
 	 */
@@ -171,14 +162,25 @@ class Console_Migrator {
 	/**
 	 * Print out help
 	 * 
-	 * <code>
-	 * %prog% help
-	 * </code>
+	 * %prog% help - Print this help
 	 * 
 	 * @param mixed $args Program Arguments
 	 */
 	public function cmd_help($args) {
-		echo str_replace('%prog%',$args[0],file_get_contents(Config::item('migrate.help')));
+		$margin = 30;
+		$matches = array();
+		$file = file_get_contents(__FILE__);
+		// Look for all comments that have %prog% at the beginning
+		preg_match_all('/\* \%prog\%(.*?)( - .*?)?$/ism', $file, $matches, PREG_SET_ORDER);
+		println('Kohana Migration Script Commands');
+		foreach($matches as $line) {
+			// Find command and help from regex but ignore missing help msg
+			@list(,$cmd,$help) = $line;
+			
+			$tab = ($margin-strlen($cmd));
+			$tab = str_repeat(' ', ($tab>1)?$tab:5);
+			println("    {$cmd}{$tab}{$help}");
+		}
 	}
 }
 
