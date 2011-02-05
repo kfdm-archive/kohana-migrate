@@ -15,7 +15,12 @@ class Migrate_Core {
 	 */
 	public static function classname($time,$tag) {
 		$hash = strtoupper(dechex($time));
-		$class = str_replace(' ','_',ucwords($tag));
+		
+		// Convert everything extra to spaces
+		$tag = preg_replace('/[^a-z0-9]+/', ' ', strtolower($tag));
+		// Uppercase words and then replace spaces with _
+		$class = preg_replace('/\s+/', '_', ucwords($tag));
+		
 		return "{$class}_{$hash}_Migration";
 	}
 	/**
