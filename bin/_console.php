@@ -9,8 +9,7 @@ error_reporting(E_ALL & ~E_STRICT);
 ini_set('display_errors', TRUE);
 define('EXT', '.php');
 
-define('MIGRATE_MODULE_PATH',realpath(dirname(__FILE__).'/..').'/');
-define('DOCROOT', realpath(MIGRATE_MODULE_PATH.'/../..').'/');
+define('DOCROOT', realpath(dirname(__FILE__).'/../../..').'/');
 #define('KOHANA',  DOCROOT.'public/index.php');
 define('APPPATH', str_replace('\\', '/', realpath(DOCROOT.'application')).'/');
 define('SYSPATH', str_replace('\\', '/', realpath(DOCROOT.'system')).'/');

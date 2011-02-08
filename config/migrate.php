@@ -1,12 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+if(!defined('MIGRATE_MODEL_PATH')) {
+	define('MIGRATE_MODULE_PATH',realpath(dirname(__FILE__).'/..').'/');
+}
+
 /**
  * This is where migrations will be stored
  * @var string
  */
 $config['path'] = APPPATH."db";
-
-$config['help'] = MIGRATE_MODULE_PATH.'USAGE.md';
 
 $config['template'] = MIGRATE_MODULE_PATH.'bin/_template.php';
 
