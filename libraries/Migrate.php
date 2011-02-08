@@ -101,7 +101,7 @@ class Migrate_Core {
 		// 'up' migration has never been run, then skip
 		if(count($r)==0 && $method=='down')
 			return;
-		
+			
 		// Start Marker
 		Database::$benchmarks[] = array(
 			'query'=>"/* Running {$class}->{$method} */",
@@ -120,10 +120,22 @@ class Migrate_Core {
 			'rows'=>0,
 		);
 		
-		$sql = 'INSERT INTO `migrations` (`created_on`,`migrated_on`,`status`) VALUES (FROM_UNIXTIME(?),FROM_UNIXTIME(?),?)';
+		self::mark($time, $class, $method);
+	}
+	/**
+	 * Mark a migration's state
+	 * 
+	 * Partly for debugging/testing purposes we keep the code to 
+	 * actually mark a migration as run, in it's own function
+	 * 
+	 * @param integer $time Unix timestamp used as migration identifier
+	 * @param string $class Migration class name to store as a human readable reference
+	 * @param string $method (up|down)
+	 */
+	public static function mark($time,$class,$method) {
+		$db = Database::instance();
+		$sql = 'INSERT INTO `migrations` (`created_on`,`migrated_on`,`class`,`status`) VALUES (FROM_UNIXTIME(?),FROM_UNIXTIME(?),?,?)';
 		$sql .= ' ON DUPLICATE KEY UPDATE `migrated_on` = VALUES(`migrated_on`), `status` = VALUES(`status`) /* IGNORE */';
-		$db->query($sql,array($time,time(),$method));
-		
-		
+		$db->query($sql,array($time,time(),$class,$method));
 	}
 }
