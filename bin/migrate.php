@@ -180,6 +180,26 @@ class Console_Migrator {
 			println("    {$cmd}{$tab}{$help}");
 		}
 	}
+	/**
+	 * Mark a migration as already run
+	 * 
+	 * %prog% mark <migration> [(up|down)] - Mark a migration as already run (DEVELOPER)
+	 * 
+	 * @param unknown_type $args
+	 * @throws Migrate_Error
+	 */
+	protected function cmd_mark($args) {
+		$file = Kohana::find_file('db',$args[2]);
+		if($file===FALSE)
+			throw new Migrate_Error('migrate.missing',$args[2]);
+			
+		$method = isset($args[3])?
+			$args[3]:'up';
+		
+		list($time,$migration) = Migrate::load($file);
+		$class = get_class($migration);
+		Migrate::mark($time,$class,$method);
+	}
 }
 
 try {
