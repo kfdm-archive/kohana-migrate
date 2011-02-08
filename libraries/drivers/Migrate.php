@@ -18,6 +18,12 @@ abstract class Migrate_Driver {
 	abstract public function drop_columns($table, $columns);
 	
 	/**
+	 * Refresh a table's columns after update
+	 * @param string $table
+	 */
+	public function refresh_table($table) { }
+	
+	/**
 	 * Run a raw SQL Query
 	 * @param string $sql
 	 * @return  object  Database_Result

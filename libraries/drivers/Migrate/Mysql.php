@@ -6,6 +6,8 @@ class Migrate_Mysql_Driver extends Migrate_Driver {
 		foreach($columns as $k=>$v)
 			$columns[$k] = "DROP `{$v}`";
 		$sql = "ALTER TABLE `{$table}` ".implode(', ',$columns);
-		return $this->db->query($sql);
+		$result = $this->db->query($sql);
+		$this->refresh_table($table);
+		return $result;
 	}
 }
