@@ -139,14 +139,12 @@ class Console_Migrator {
 	 * @throws Migrate_Error
 	 */
 	protected function _cmd_run_one($args,$method) {
-		foreach(Migrate::migrations() as $file)
-			if(basename($file,'.php')==$args[2])
-				$run = $file;
-		if(!isset($run))
+		$file = Kohana::find_file('db',$args[2]);
+		if($file===FALSE)
 			throw new Migrate_Error('migrate.missing',$args[2]);
 		
 		println('Running migration '.$args[2]);
-		Migrate::run($run, $method);
+		Migrate::run($file, $method);
 	}
 	/**
 	 * List available migrations
