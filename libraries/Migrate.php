@@ -32,7 +32,7 @@ class Migrate_Core {
 	public static function encode($time,$tag) {
 		$path = Config::item('migrate.path');
 		
-		$date = strftime('%F', $time);
+		$date = strftime('%Y-%m-%d', $time);
 		$hash = strtoupper(dechex($time));
 		$class = self::classname($time,$tag);
 		$tag = url::title($tag,'-');
