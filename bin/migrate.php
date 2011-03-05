@@ -157,6 +157,28 @@ class Console_Migrator {
 	    foreach(Migrate::migrations() as $file)
 	        println(basename($file,'.php'));
 	}
+	
+	/**
+	 * Revert the previously run command
+	 * 
+	 * %prog% revert - Revert the previously run command
+	 * 
+	 * @param mixed $args
+	 */
+	protected function cmd_revert($args) {
+		$files = Migrate::migrations();
+		$files = array_reverse($files); // Reverse order
+		foreach($files as $file) {
+			$status = Migrate::status($file);
+			if($status===NULL) continue;
+			if($status->status=='down') continue; // Skip ones already down
+			
+			// If we found one
+			Migrate::run($file,'down');
+			break;
+		}
+	}
+	
 	/**
 	 * Print out help
 	 * 

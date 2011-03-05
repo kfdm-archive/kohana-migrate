@@ -88,6 +88,20 @@ class Migrate_Core {
 		return $files;
 	}
 	/**
+	 * Query the status of a migration by file
+	 * @param string $file Migration file
+	 * @return NULL|Database_Result
+	 */
+	public static function status($file) {
+		$db = Database::instance();
+		list($time,$class) = self::decode($file);
+		$r = $db->query('SELECT * FROM `migrations` WHERE `created_on` = FROM_UNIXTIME(?) /* IGNORE */',array($time));
+		return count($r)?
+			$r->current():
+			NULL;
+	}
+	
+	/**
 	 * Run a migration
 	 * This function is responsible for running a migration and
 	 * keeping track of migrations to prevent them running again
