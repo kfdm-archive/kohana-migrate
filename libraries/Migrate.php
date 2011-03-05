@@ -8,6 +8,19 @@
  */
 class Migrate_Core {
 	/**
+	 * Simple logger for Migration
+	 * 
+	 * While running in a console it will print to STDOUT with \n
+	 * and while running in a page will print ending with a <br />
+	 * @param string $string
+	 */
+	public static function log($string) {
+		if(defined('STDOUT'))
+			fwrite(STDOUT, "{$string}\n");
+		else
+			echo "{$string}<br />\n";
+	}
+	/**
 	 * Generate migration classname
 	 * @param integer $time Unix timestamp
 	 * @param string $tag Tags with whitespace in the form "word word word"
@@ -108,7 +121,9 @@ class Migrate_Core {
 			'time'=>0,
 			'rows'=>0,
 		);
-			
+		
+		self::log("Running {$class}->{$method}()");
+		
 		$start = microtime(TRUE);
 		$migration->$method();
 		$stop = microtime(TRUE);
