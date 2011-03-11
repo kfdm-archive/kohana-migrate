@@ -159,6 +159,25 @@ class Console_Migrator {
 	}
 	
 	/**
+	 * Run only the next migration
+	 * 
+	 * %prog% forward - Run only the next migration
+	 * 
+	 * @param mixed $args
+	 */
+	protected function cmd_forward($args) {
+		$files = Migrate::migrations();
+		foreach($files as $file) {
+			$status = Migrate::status($file);
+			if($status!==NULL && $status->status=='up') continue; // Skip ones already up
+			
+			// If we found one
+			Migrate::run($file,'up');
+			break;
+		}
+	}
+	
+	/**
 	 * Revert the previously run command
 	 * 
 	 * %prog% revert - Revert the previously run command
