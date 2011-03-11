@@ -76,15 +76,26 @@ class Migrate_Core {
 	}
 	/**
 	 * Get a list of migration files
+	 * 
 	 * Uses the Kohana::list_files() function but skips
 	 * files that don't end in .php
+	 * 
+	 * Since the time part we store in a file is in hex
+	 * to reduce the length, we have to decode that when
+	 * we read the file, and use that as an array key to
+	 * sort with.
+	 * 
 	 * @return array List of migration folders
 	 */
 	public static function migrations() {
 		$files = array();
-		foreach(Kohana::list_files('db') as $file)
-			if(substr_compare($file, '.php', -4, 4) === 0)
-				$files[] = $file;
+		foreach(Kohana::list_files('db') as $file) {
+			if(substr_compare($file, '.php', -4, 4) === 0) {
+				list($time,$class) = self::decode($file);
+				$files[$time] = $file;
+			}
+		}
+		ksort($files,SORT_NUMERIC);
 		return $files;
 	}
 	/**
