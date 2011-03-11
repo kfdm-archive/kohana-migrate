@@ -10,10 +10,6 @@ if(!defined('MIGRATE_MODULE_PATH')) {
  */
 $config['path'] = APPPATH."db";
 
-$config['template'] = MIGRATE_MODULE_PATH.'bin/_template.php';
-
 $config['table'] = 'migrations';
-
-$config['setup'] = MIGRATE_MODULE_PATH.'bin/_migration.sql';
 
 $config['driver'] = 'mysql';

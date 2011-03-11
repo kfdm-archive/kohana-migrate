@@ -56,7 +56,8 @@ class Console_Migrator {
 		$table = Config::item('migrate.table');
 		if($db->table_exists($table))
 			throw new Migrate_Error('migrate.config_table_exists',$table);
-		$migration = Config::item('migrate.setup');
+			
+		$migration = Kohana::find_file('db','migration.sql',TRUE,TRUE);
 		
 		$sql = file_get_contents($migration);
 		$sql = str_replace('`migration_table`',"`{$table}`",$sql);
@@ -72,7 +73,7 @@ class Console_Migrator {
 	 * @param array $args Program arguments
 	 */
 	protected function cmd_create($args) {
-		$template = Config::item('migrate.template');
+		$template = Kohana::find_file('db','migration.tmpl',TRUE,TRUE);
 		
 		if(!isset($args[2]))
 			throw new Migrate_Error('migrate.args_tag');
