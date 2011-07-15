@@ -153,10 +153,17 @@ class Console_Migrator {
 	 * %prog% list - List all migrations
 	 * 
 	 * @param unknown_type $args
+	 * @todo Reduce the number of queries Migrate::status() has to run
 	 */
 	protected function cmd_list($args) {
-	    foreach(Migrate::migrations() as $file)
-	        println(basename($file,'.php'));
+		printf("| %-4s | %-4s | %s\n",'Up','Down','Name');
+	    foreach(Migrate::migrations() as $file) {
+	    	$status = Migrate::status($file);
+	    	$up = ($status->status=='up')?'X':'';
+	    	$down = ($status->status=='down')?'X':'';
+	    	$name = basename($file,'.php');
+	    	printf("| %-4s | %-4s | %s\n",$up,$down,$name);
+	    }
 	}
 	
 	/**
