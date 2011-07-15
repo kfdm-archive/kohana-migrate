@@ -159,8 +159,8 @@ class Console_Migrator {
 		printf("| %-4s | %-4s | %s\n",'Up','Down','Name');
 	    foreach(Migrate::migrations() as $file) {
 	    	$status = Migrate::status($file);
-	    	$up = ($status->status=='up')?'X':'';
-	    	$down = ($status->status=='down')?'X':'';
+	    	$up = (is_object($status) && $status->status=='up')?'X':'';
+	    	$down = (is_object($status) && $status->status=='down')?'X':'';
 	    	$name = basename($file,'.php');
 	    	printf("| %-4s | %-4s | %s\n",$up,$down,$name);
 	    }
